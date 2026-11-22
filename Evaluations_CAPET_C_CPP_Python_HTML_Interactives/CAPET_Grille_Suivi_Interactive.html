@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CAPET 2027 — Grille de suivi des diagnostics</title>
+<style>
+:root{--bg:#f2f5f8;--ink:#17273a;--secondary:#56687c;--line:#d7e2e9;--teal:#086e82}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}header{background:#102b3b;color:white;padding:23px max(20px,calc((100vw - 1080px)/2))}header h1{font-size:22px;margin:2px 0 4px}header p{color:#c7d6df;font-size:13px;margin:0}.wrapper{max-width:1080px;margin:22px auto;padding:0 16px}.card{background:white;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:17px;box-shadow:0 2px 12px #15294308}.intro{color:var(--secondary)}.notice{background:#fff6e7;border-left:4px solid #d99931;border-radius:0 8px 8px 0;padding:12px 15px;margin:14px 0}.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.tile{border:1px solid var(--line);border-radius:10px;padding:16px}.tile h2{font-size:19px;margin:0 0 9px}.tile div{font-size:13px;color:var(--secondary);margin:6px 0}.tile strong{font-size:21px;color:var(--ink)}label{font-weight:650;display:block;margin:12px 0 5px}input,textarea{font:inherit;display:block;width:100%;border-radius:8px;border:1px solid #c2d0db;padding:9px 11px;background:white;color:var(--ink)}textarea{min-height:80px;resize:vertical}button{cursor:pointer;border:1px solid #c6d5df;border-radius:8px;background:#fff;font:600 14px system-ui;padding:9px 13px;color:var(--ink)}button:hover{background:#edf6f8}button.primary{color:white;background:var(--teal);border-color:var(--teal)}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #49b2c2;outline-offset:2px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.scoregrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.scoregrid label{font-size:13px}.scoregrid input{width:100%}.dual{display:grid;grid-template-columns:1fr 1fr;gap:12px}.meta{font-size:12px;color:var(--secondary)}.level{display:inline-block;background:#eff5f8;padding:5px 8px;border-radius:7px;font-weight:700}.footer{color:var(--secondary);font-size:12px;margin:15px 2px 25px}@media(max-width:850px){.board{grid-template-columns:1fr}.scoregrid{grid-template-columns:repeat(2,minmax(0,1fr))}.dual{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>CAPET 2027 · Tableau de suivi C / C++ / Python</h1><p>Bilan personnel hors ligne · Scores à renseigner uniquement après correction</p></header>
+<div class="wrapper">
+<section class="card">
+ <strong>Mode d'emploi</strong>
+ <p class="intro">Après chaque épreuve, importe le fichier JSON exporté par le diagnostic. Le nombre de questions et la durée seront récupérés. Après notre correction, reporte les scores des cinq blocs dans les cases prévues. Tu peux conserver ce bilan et l'exporter en JSON.</p>
+ <div class="notice"><strong>Attention :</strong> un exercice « terminé » n'est pas nécessairement correct. La grille n'attribue aucune note automatiquement à partir des réponses, et n'affiche un total que si les cinq scores ont été renseignés.</div>
+ <div class="row"><button class="primary" id="export">Exporter le bilan JSON</button><button id="importSaved">Importer un ancien bilan JSON</button><button id="clear">Réinitialiser le bilan</button><span class="meta" id="stateSave">—</span></div>
+</section>
+<section class="card"><h2>Synthèse des trois langages</h2><div class="board" id="summary"></div></section>
+<div id="details"></div>
+<p class="footer">Aucune connexion Internet, aucune correction automatique. Les résultats de ce document sont des repères de préparation, pas des notes officielles du concours. Échelle : R = 0–39, J = 40–59, V = 60–79, V+ = 80–100.</p>
+</div>
+<input type="file" id="fileInput" accept=".json,application/json" hidden>
+<script>
+"use strict";
+/* Fichier entièrement autonome, JavaScript simple et commenté en français. */
+const SPECS=[
+ {id:'C',label:'C',blocks:[['C1',15,'Mémoire et sémantique'],['C2',20,'Lecture de code'],['C3',20,'Débogage'],['C4',35,'FIFO et tests'],['C5',10,'Bits et registres']]},
+ {id:'CPP',label:'C++',blocks:[['CPP1',15,'C++ moderne'],['CPP2',20,'Lecture de code'],['CPP3',20,'Ressources'],['CPP4',35,'Capteurs et tests'],['CPP5',10,'Concurrence']]},
+ {id:'PY',label:'Python',blocks:[['PY1',15,'Sémantique'],['PY2',20,'Lecture de code'],['PY3',20,'Débogage'],['PY4',35,'CSV et tests'],['PY5',10,'Résilience embarquée']]}
+];
+const KEY='capet-suivi-diagnostics-v1';
+const state=Object.fromEntries(SPECS.map(s=>[s.id,{date:'',minutes:'',completed:'',assistance:'',scores:{},strengths:'',weaknesses:'',objectives:''}]));
+let filePurpose='';
+const $=id=>document.getElementById(id);
+function safeSave(){try{localStorage.setItem(KEY,JSON.stringify(state));$('stateSave').textContent='Sauvegarde locale effectuée';}catch(e){$('stateSave').textContent='Sauvegarde locale indisponible : exporter le JSON';}}
+function restore(){try{const prev=JSON.parse(localStorage.getItem(KEY)||'{}');for(const s of SPECS) if(prev[s.id])Object.assign(state[s.id],prev[s.id]);}catch(e){$('stateSave').textContent='Sauvegarde locale indisponible';}}
+function scoreOf(s){const x=state[s.id];let total=0;for(const [id,max] of s.blocks){let n=x.scores[id];if(n===''||n===undefined||n===null)return null;const f=Number(n);if(!Number.isFinite(f)||f<0||f>max)return null;total+=f;}return total;}
+function grade(v){return v===null?'Non évalué':v<40?'R':v<60?'J':v<80?'V':'V+';}
+function item(tag,cl,txt,parent){const e=document.createElement(tag);if(cl)e.className=cl;if(txt!==undefined)e.textContent=txt;parent.appendChild(e);return e;}
+function click(label,parent,cb,cls=''){let b=item('button',cls,label,parent);b.type='button';b.addEventListener('click',cb);return b;}
+function inputField(parent,s,key,label,kind='textarea'){
+  let lab=item('label','',label,parent);const id='field-'+s.id+'-'+key;lab.htmlFor=id;
+  let e=item(kind==='textarea'?'textarea':'input','',undefined,parent);e.id=id;
+  if(kind!=='textarea')e.type='text';e.value=state[s.id][key]||'';
+  e.addEventListener('input',()=>{state[s.id][key]=e.value;safeSave();renderSummary();});
+}
+function renderSummary(){const root=$('summary');root.replaceChildren();for(const s of SPECS){let x=state[s.id],total=scoreOf(s);let tile=item('div','tile',undefined,root);item('h2','',s.label,tile);item('div','',x.date?'Évaluation : '+x.date:'Évaluation non importée',tile);item('strong','',total===null?'— / 100':total+' / 100',tile);item('div','', 'Niveau : '+grade(total),tile);item('div','',x.completed!==''?x.completed+' exercices marqués terminés sur 12':'Progression à importer',tile);}}
+function renderDetails(){const root=$('details');root.replaceChildren();for(const s of SPECS){
+ let section=item('section','card',undefined,root);item('h2','',s.label+' · résultats détaillés',section);
+ const bar=item('div','row',undefined,section);
+ click('Importer le JSON de l’épreuve '+s.label,bar,()=>{$('fileInput').click();filePurpose=s.id;});
+ const v=item('span','meta',`Durée active : ${state[s.id].minutes||'—'} min. · Aides : ${state[s.id].assistance||'non renseignées'}`,bar);
+ let date=document.createElement('div');date.className='dual';section.appendChild(date);
+ inputField(date,s,'date','Date de passation','input');
+ inputField(date,s,'minutes','Durée effective (minutes)','input');
+ item('h3','', 'Points attribués après correction',section);
+ const scores=item('div','scoregrid',undefined,section);
+ for(const [bid,max,desc] of s.blocks){
+   const cell=item('div','',undefined,scores);
+   let label=item('label','',`${bid} · ${desc} / ${max}`,cell);
+   let input=item('input','',undefined,cell);input.type='number';input.min='0';input.max=String(max);input.step='0.5';input.placeholder='—';
+   input.value=state[s.id].scores?.[bid]??'';
+   input.addEventListener('input',()=>{let value=input.value;if(value!==''&&(Number(value)<0||Number(value)>max)){input.setCustomValidity('Score attendu entre 0 et '+max);}else input.setCustomValidity('');state[s.id].scores[bid]=value;safeSave();renderSummary();});
+ }
+ const notes=item('div','dual',undefined,section);
+ inputField(notes,s,'strengths','Points forts');inputField(notes,s,'weaknesses','Points à renforcer');
+ inputField(section,s,'objectives','Objectif et date du prochain test');
+ }}
+function exportJSON(){
+ const payload={format:'capet-bilan-diagnostics',version:1,date_export:new Date().toISOString(),
+   baremes:Object.fromEntries(SPECS.map(s=>[s.id,s.blocks.map(b=>({id:b[0],max:b[1]}))])),
+   bilans:Object.fromEntries(SPECS.map(s=>[s.id,{...state[s.id],total:scoreOf(s),niveau:grade(scoreOf(s))}]))};
+ const url=URL.createObjectURL(new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'}));
+ const a=document.createElement('a');a.href=url;a.download='CAPET_bilan_diagnostics.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+async function importFile(file){if(!file)return;try{
+ let data=JSON.parse(await file.text());
+ if(filePurpose==='bilan'){
+   if(data.format!=='capet-bilan-diagnostics')throw new Error('Ce n’est pas un bilan de suivi.');
+   if(!confirm('Remplacer le bilan actuel par ce fichier ?'))return;
+   for(const s of SPECS)if(data.bilans?.[s.id])Object.assign(state[s.id],data.bilans[s.id]);
+ }else{
+   if(data.format!=='capet-diagnostic-hors-ligne'||data.epreuve?.id!==filePurpose)throw new Error('Ce JSON ne correspond pas au langage sélectionné.');
+   let x=state[filePurpose];let p=data.passation||{};
+   x.date=(p.date_export||'').slice(0,10);
+   x.minutes=String(Math.round((p.temps_actif_secondes||0)/60));
+   x.completed=String(data.progression?.termines??'');
+   x.assistance=p.assistance||'';
+ }
+ safeSave();renderSummary();renderDetails();alert('Données importées.');
+ }catch(e){alert('Import impossible : '+e.message);}finally{$('fileInput').value='';filePurpose='';}}
+$('export').addEventListener('click',exportJSON);
+$('importSaved').addEventListener('click',()=>{filePurpose='bilan';$('fileInput').click();});
+$('fileInput').addEventListener('change',e=>importFile(e.target.files[0]));
+$('clear').addEventListener('click',()=>{if(!confirm('Effacer toutes les données de suivi locales ?'))return;for(const s of SPECS)Object.assign(state[s.id],{date:'',minutes:'',completed:'',assistance:'',scores:{},strengths:'',weaknesses:'',objectives:''});safeSave();renderSummary();renderDetails();});
+restore();renderSummary();renderDetails();
+</script>
+</body></html>

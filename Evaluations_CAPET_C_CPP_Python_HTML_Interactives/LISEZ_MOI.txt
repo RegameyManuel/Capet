@@ -1,0 +1,56 @@
+ÉVALUATIONS CAPET SII – C / C++ / PYTHON
+=======================================
+
+Ce dossier contient quatre pages HTML entièrement autonomes :
+
+• CAPET_Diagnostic_C_Interactif.html      (C11)
+• CAPET_Diagnostic_CPP_Interactif.html    (C++17)
+• CAPET_Diagnostic_PY_Interactif.html     (Python 3.11+)
+• CAPET_Grille_Suivi_Interactive.html     (tableau de résultats)
+
+UTILISATION
+-----------
+1. Décompresser le ZIP. Ouvrir le premier fichier HTML en double-cliquant,
+   depuis Firefox, Edge ou Chrome. Aucun serveur ni accès Internet requis.
+2. Renseigner les conditions de passation dans « Passation ».
+3. Démarrer le chronomètre. Il se met en pause lorsque l'onglet est masqué.
+4. Répondre aux questions ; pour la programmation, saisir le code et les tests.
+   Un simple éditeur de texte est fourni, sans compilation ni correction automatique.
+5. À la fin, cliquer sur « Bilan / Export », puis télécharger le JSON.
+6. Me transmettre ce JSON dans la conversation pour une correction détaillée.
+7. Après correction, importer le JSON de l'épreuve dans la grille de suivi,
+   et renseigner les points attribués pour chacun des cinq blocs.
+
+SAUVEGARDE / REPRISE
+-------------------
+Les fichiers tentent de sauvegarder automatiquement les saisies via le stockage
+local du navigateur. Selon le navigateur et ses paramètres de sécurité, ce
+stockage peut être indisponible pour les fichiers ouverts depuis le disque.
+Il est donc recommandé d'EXPORTER UN JSON RÉGULIÈREMENT, pas seulement à la fin.
+Le bouton « Importer un JSON existant » permet de reprendre une séance.
+L'import remplace les données courantes de l'épreuve correspondante uniquement.
+Les JSON exportés restent exploitables même si la sauvegarde locale échoue.
+
+CONDITIONS D'UN DIAGNOSTIC SÉRIEUX
+---------------------------------
+Pour les questions de lecture de code : raisonner sans exécuter le programme.
+Pour les exercices complets : écrire d'abord le code seul, puis compiler et
+corriger si nécessaire en le déclarant dans les conditions de passation.
+Préciser les ressources éventuellement utilisées ; un diagnostic honnête
+est plus intéressant qu'une bonne note obtenue avec une aide externe.
+
+Le JSON stocke les réponses, les codes et les tests et contient les énoncés
+pour faciliter une correction ultérieure. Il ne contient aucun corrigé ni
+aucun résultat chiffré attribué automatiquement.
+
+DONNÉES ET MAINTENANCE
+---------------------
+Chaque fichier HTML contient son CSS, les données de questions et son
+JavaScript (en clair, commenté en français), sans dépendance externe.
+Les sujets reprennent les questions et barèmes des DOCX fournis.
+
+Aucune donnée ne transite par Internet par l'intermédiaire de ces fichiers.
+L'import et l'export se font uniquement par des fichiers JSON locaux.
+
+IMPORTANT : ne pas modifier les fichiers HTML pendant une passation ;
+conserver un exemplaire de sauvegarde JSON de chaque épreuve.

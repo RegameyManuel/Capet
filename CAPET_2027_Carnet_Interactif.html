@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CAPET SII 2027 — Carnet de préparation interactif</title>
+<style>
+:root {
+  --ink:#15233a; --sub:#53647a; --accent:#086e82; --accent2:#0b5566;
+  --bg:#f2f5f8; --card:#fff; --line:#dbe3ec; --muted:#edf3f6;
+  --good:#27764a; --warning:#99561a; --font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.53 var(--font)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #4caec4;outline-offset:2px}
+.top{background:#102b3b;color:#fff;padding:18px max(20px,calc((100vw - 1440px)/2));display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.top h1{margin:0;font-size:21px}.top small{color:#c0d6e1}.topright{display:flex;align-items:center;flex-wrap:wrap;gap:9px}
+.tag{background:#215467;color:#c9eaf0;border-radius:999px;padding:5px 10px;font-size:12px}
+.layout{max-width:1440px;margin:auto;padding:22px 18px;display:grid;grid-template-columns:280px minmax(0,1fr);gap:20px}
+.sidebar,.sheet{background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:0 2px 12px #16223b08}
+.sidebar{padding:18px;position:sticky;top:14px;align-self:start;max-height:calc(100vh - 28px);overflow:auto}
+.sheet{min-height:640px;padding:28px 32px}.subtle,.meta{color:var(--sub);font-size:13px}.meta{font-size:12px}
+.nav-title{font-size:12px;font-weight:750;text-transform:uppercase;letter-spacing:.07em;color:var(--sub);margin:20px 0 7px}
+.navbtn{display:flex;align-items:center;gap:8px;text-align:left;width:100%;padding:9px 10px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--ink)}
+.navbtn:hover,.btn:hover{background:#edf6f8}.navbtn.active{border-color:#b6d5db;background:#e6f4f5;color:#075265;font-weight:700}
+.navbtn small{margin-left:auto;color:var(--sub);font-size:11px}.dot{width:9px;height:9px;border-radius:50%;flex:none;background:#c4ced7}.dot.worked{background:#db983c}.dot.tested{background:var(--good)}
+.progressbar{margin:10px 0 7px;background:#e6ecef;border-radius:8px;height:9px;overflow:hidden}.progressbar>div{height:100%;background:var(--accent);transition:width .2s}
+.eyebrow{color:var(--accent);font-weight:750;text-transform:uppercase;letter-spacing:.06em;font-size:12px}
+h2{font-size:24px;line-height:1.27;margin:6px 0 8px}h3{font-size:17px;margin:18px 0 8px}h4{font-size:14px;margin:0 0 8px}
+p{margin:10px 0}.intro{color:var(--sub);margin-top:7px}
+.badge{display:inline-block;border-radius:6px;background:#eaf4f7;color:#075b70;font-weight:700;padding:4px 8px;font-size:12px;vertical-align:middle}
+.badge.p1{background:#fcebd9;color:#8c4b11}.badge.p2{background:#eef2f8;color:#53647a}
+.btn{background:#fff;border:1px solid #c9d5df;border-radius:8px;padding:9px 14px;font-weight:650}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:white}.btn.primary:hover{background:var(--accent2)}.btn.small{font-size:12px;padding:6px 10px}.btn.ghost{border:0;background:transparent;color:var(--sub)}.btn.danger{color:#9c3434;border-color:#ecc9c9}
+.row{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.actions{display:flex;flex-wrap:wrap;gap:9px;margin:20px 0 6px}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:22px 0}.tile,.panel{border:1px solid var(--line);border-radius:11px;background:#fbfdff;padding:16px}
+.tile strong{font-size:29px;font-variant-numeric:tabular-nums;display:block}.tile span{font-size:12px;color:var(--sub)}
+.domains{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.domain{border:1px solid var(--line);background:#fff;border-radius:10px;padding:15px}
+.domain .head{display:flex;gap:8px;align-items:center;justify-content:space-between}.domain strong{font-size:15px}.domain p{font-size:13px;color:var(--sub);margin:7px 0 10px}
+.domain .progressbar{height:7px}.domain .btn{margin-top:7px}
+.notice{border-left:4px solid #d69b31;background:#fff8e8;padding:12px 15px;border-radius:0 8px 8px 0;margin:17px 0}
+.tip{border-left:4px solid var(--accent);background:#f1f8fa;padding:12px 15px;border-radius:0 8px 8px 0;margin:17px 0}
+.field{margin:15px 0}.field label{display:block;font-weight:700;margin-bottom:6px}.field small{display:block;color:var(--sub);font-weight:400;margin-top:3px}
+input[type=date],input[type=number],input[type=text],select,textarea{width:100%;background:#fff;border:1px solid #bdcdd9;border-radius:8px;padding:10px 12px}
+textarea{min-height:115px;resize:vertical}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.formgrid.third{grid-template-columns:repeat(3,minmax(0,1fr))}
+.check{display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-weight:600}.check input{width:18px;height:18px;accent-color:var(--accent);flex:none;margin-top:3px}
+.skillgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.skillrow{border:1px solid var(--line);border-radius:9px;padding:14px;background:#fff;display:flex;align-items:flex-start;gap:10px}
+.skillrow main{flex:1}.skillrow strong{font-size:14px}.skillrow p{font-size:13px;margin:4px 0;color:var(--sub)}.skillrow .btn{margin-top:7px}
+.statuspill{font-size:12px;font-weight:700;background:#edf3f6;border-radius:5px;padding:4px 7px;white-space:nowrap}
+.statuspill.R{background:#ffe7e7;color:#8c2b2b}.statuspill.J{background:#fff0d7;color:#92500f}.statuspill.V{background:#e2f4e9;color:#216c40}.statuspill.Vplus{background:#daf1f4;color:#075b70}
+.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}th,td{padding:10px 9px;border-bottom:1px solid var(--line);vertical-align:top}th{background:#f2f6f8;color:#455971;font-weight:700}td.actions-cell{white-space:nowrap}
+.filterbar{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin:16px 0}.rule{height:1px;background:var(--line);margin:22px 0}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:#eef3f7;padding:2px 4px;border-radius:4px;font-size:13px}
+.footer{color:var(--sub);font-size:12px;max-width:1440px;margin:auto;padding:4px 22px 30px}
+a{color:var(--accent2)}.hidden{display:none!important}
+.empty{padding:22px;text-align:center;color:var(--sub);background:#f7fafc;border:1px dashed #d3dfe6;border-radius:9px}
+@media(max-width:920px){.layout{display:block;padding:12px}.sidebar{position:static;max-height:none;margin-bottom:14px}.sheet{padding:20px 17px;min-height:450px}.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.domains,.skillgrid{grid-template-columns:1fr}.top{padding:15px}}
+@media(max-width:570px){.formgrid,.formgrid.third,.filterbar{grid-template-columns:1fr}.tiles{grid-template-columns:1fr 1fr}.tile strong{font-size:24px}}
+@media print{body{background:white}.top,.sidebar,.actions,.footer,.btn,.filterbar{display:none!important}.layout{display:block;padding:0}.sheet{box-shadow:none;border:0;padding:0}.domains,.skillgrid{display:block}.domain,.skillrow{break-inside:avoid;margin-bottom:8px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div><small>CAPET SII 2027 · Ingénierie informatique · suivi personnel</small><h1>Carnet de préparation interactif</h1></div>
+  <div class="topright"><span class="tag">34 compétences · 8 domaines</span><span class="meta" id="saveStatus" style="color:#c0d6e1">—</span></div>
+</header>
+<div class="layout">
+  <aside class="sidebar" aria-label="Navigation du carnet CAPET">
+    <strong>Progression générale</strong><p class="subtle" id="sideProgress">0 / 34 compétences travaillées</p>
+    <div class="progressbar"><div id="sideBar" style="width:0%"></div></div>
+    <div id="navigation"></div>
+    <div class="nav-title">Sauvegardes</div>
+    <div class="actions"><button class="btn small primary" id="exportSide">Exporter JSON</button><button class="btn small" id="importSide">Importer JSON</button></div>
+    <p class="subtle">Hors ligne. Les notes sont saisies après correction, jamais attribuées automatiquement à partir du travail déclaré.</p>
+  </aside>
+  <main class="sheet" id="content" aria-live="polite"></main>
+</div>
+<footer class="footer">Carnet personnel d'après le document « CAPET SII 2027 – Liste de travail & suivi des acquis ». Priorités et niveaux R/J/V/V+ : indicateurs personnels, non officiels. Aucune donnée n'est envoyée sur Internet.</footer>
+<input id="jsonFile" class="hidden" type="file" accept=".json,application/json">
+<script type="application/json" id="sourceData">{"title":"CAPET SII 2027","subtitle":"Option ingénierie informatique · Carnet de préparation","blocks":[{"id":"A","title":"Architecture et ingénierie logicielle","priority":"P2"},{"id":"B","title":"C / C++ / Python et algorithmique","priority":"P1"},{"id":"C","title":"Systèmes embarqués et temps réel","priority":"P1"},{"id":"D","title":"Réseaux industriels et communications","priority":"P1"},{"id":"E","title":"Supervision, IHM et interfaces","priority":"P2"},{"id":"F","title":"Acquisition, données et traitement","priority":"P1"},{"id":"G","title":"Cybersécurité industrielle","priority":"P2"},{"id":"H","title":"Entraînement aux épreuves et entretien","priority":"P1"}],"skills":[{"id":"A1","domain":"A","label":"Lire / produire un diagramme UML simple (classes, séquence).","priority":"P2"},{"id":"A2","domain":"A","label":"Décomposer un logiciel en modules ; expliquer client–serveur et API.","priority":"P1"},{"id":"A3","domain":"A","label":"Mettre en œuvre POO, tests unitaires et gestion d’erreurs.","priority":"P2"},{"id":"A4","domain":"A","label":"Utiliser Git (commit, branche, fusion), Make et comprendre une VM.","priority":"P2"},{"id":"B1","domain":"B","label":"Écrire et déboguer en C : pointeurs, tableaux, structures, mémoire.","priority":"P1"},{"id":"B2","domain":"B","label":"Écrire en C++ : classes, encapsulation, héritage simple.","priority":"P1"},{"id":"B3","domain":"B","label":"Écrire un script Python de traitement / acquisition de données.","priority":"P1"},{"id":"B4","domain":"B","label":"Implémenter listes, piles, files et algorithmes simples.","priority":"P1"},{"id":"B5","domain":"B","label":"Écrire un programme robuste : erreurs, tests et bibliothèques/API.","priority":"P1"},{"id":"B6","domain":"B","label":"Réaliser une communication réseau TCP/IP élémentaire.","priority":"P2"},{"id":"C1","domain":"C","label":"Identifier architecture MCU et utiliser GPIO / interruptions.","priority":"P1"},{"id":"C2","domain":"C","label":"Configurer timers, PWM, watchdog et acquisition simple.","priority":"P1"},{"id":"C3","domain":"C","label":"Programmer en C embarqué ; comprendre registres et mémoire.","priority":"P1"},{"id":"C4","domain":"C","label":"Expliquer RTOS : tâche, file, mutex, priorité, synchronisation.","priority":"P1"},{"id":"C5","domain":"C","label":"Identifier les modes veille et leurs compromis énergétiques.","priority":"P2"},{"id":"C6","domain":"C","label":"Utiliser Linux, shell et scripts de base sur Raspberry Pi.","priority":"P2"},{"id":"D1","domain":"D","label":"Calculer un sous-réseau IPv4 ; expliquer topologies et VLAN.","priority":"P1"},{"id":"D2","domain":"D","label":"Comparer UART, RS232, RS485 et CAN ; analyser une trame.","priority":"P1"},{"id":"D3","domain":"D","label":"Expliquer / exploiter Modbus, MQTT et HTTP.","priority":"P1"},{"id":"D4","domain":"D","label":"Comparer Wi-Fi, LoRa, ZigBee et diagnostiquer une liaison.","priority":"P2"},{"id":"E1","domain":"E","label":"Piloter un afficheur LCD / OLED et documenter son interface.","priority":"P2"},{"id":"E2","domain":"E","label":"Créer une IHM web : état, alarme, historique et supervision.","priority":"P2"},{"id":"F1","domain":"F","label":"Choisir un capteur ; CAN/CNA, fréquence, Shannon.","priority":"P1"},{"id":"F2","domain":"F","label":"Stocker en CSV/JSON ; écrire SQL, jointure simple, SQLite.","priority":"P1"},{"id":"F3","domain":"F","label":"Appliquer seuil, moyenne glissante, statistiques et anomalies.","priority":"P1"},{"id":"F4","domain":"F","label":"Visualiser les données avec Python ou un tableur.","priority":"P2"},{"id":"F5","domain":"F","label":"Expliquer une régression linéaire et une classification simple.","priority":"P2"},{"id":"G1","domain":"G","label":"Distinguer authentification, intégrité, chiffrement ; SSH/HTTPS.","priority":"P1"},{"id":"G2","domain":"G","label":"Expliquer segmentation/VPN et risques d’un protocole non sûr.","priority":"P2"},{"id":"G3","domain":"G","label":"Décrire mises à jour OTA : vérification, risques, sécurité.","priority":"P2"},{"id":"H1","domain":"H","label":"Écrit 1 : modélisation d’un produit, calculs et justification.","priority":"P1"},{"id":"H2","domain":"H","label":"Écrit 2 : résolution de problème, dossier, conception.","priority":"P1"},{"id":"H3","domain":"H","label":"Oral TP : protocole expérimental, mesures, exposé, échange.","priority":"P2"},{"id":"H4","domain":"H","label":"Entretien : parcours, motivation, laïcité, service public.","priority":"P2"}],"milestones":["Faire un diagnostic initial sur B1 (C), C1 (GPIO/interruptions) et D1 (réseaux).","Télécharger / parcourir les sujets 2026 des deux épreuves écrites pour calibrer le niveau.","Réaliser au moins un sujet partiel chronométré, puis un sujet long.","Préparer une présentation de 5 min de son parcours et de sa motivation."],"protocol":["Format courant : 15–25 minutes ; connaissances, application et justification. Les études de cas peuvent durer davantage.","Correction : note /20, erreurs à comprendre, niveau R / J / V / V+ et deux pistes de progression.","Après un résultat R ou J : retravailler la notion, puis refaire un test différent. Après V ou V+ : réévaluation espacée pour confirmer.","Un exercice d’annales doit être corrigé avec une grille spécifique : les seuils R / J / V / V+ restent un indicateur personnel."],"references":[{"text":"Programme 2027","url":"https://www.devenirenseignant.gouv.fr/media/20835/download"},{"text":"Épreuves bac+3","url":"https://www.devenirenseignant.gouv.fr/les-epreuves-du-capet-externe-bac3-section-sciences-industrielles-de-l-ingenieur-1508"},{"text":"Sujets et rapports du jury 2026","url":"https://www.devenirenseignant.gouv.fr/sujets-et-rapports-des-jurys-concours-du-Capet-de-2026-1656"}]}</script>
+<script>
+"use strict";
+/*
+ * Carnet CAPET autonome, sans bibliothèque et sans serveur.
+ * Le contenu des compétences provient du document Word transmis.
+ * Les résultats ne sont jamais inventés : seul un test saisi affiche une note.
+ * Les fonctions sont volontairement courtes et commentées pour modification ultérieure.
+ */
+const SPEC=JSON.parse(document.getElementById('sourceData').textContent);
+const STORAGE_KEY='capet-carnet-2027-hors-ligne-v1';
+const $=id=>document.getElementById(id);
+const skillsById=Object.fromEntries(SPEC.skills.map(s=>[s.id,s]));
+const view={name:'home',value:''};
+let fieldSequence=0;
+let state=freshState();
+let saveEnabled=true;
+let globalFilters={query:'',priority:'all',stage:'all'};
+
+function freshState(){
+ const skills={};
+ for(const s of SPEC.skills) skills[s.id]={worked:false,notes:'',validated:false};
+ return {format:'capet-carnet-2027',version:1,skills,tests:[],milestones:SPEC.milestones.map(()=>false)};
+}
+function normalized(data){
+ if(!data || data.format!=='capet-carnet-2027'||!data.skills||!Array.isArray(data.tests))
+  throw new Error('Ce fichier n’est pas une sauvegarde de ce carnet.');
+ const result=freshState();
+ for(const s of SPEC.skills){
+  const v=data.skills[s.id];
+  if(!v)continue;
+  result.skills[s.id]={worked:v.worked===true,notes:typeof v.notes==='string'?v.notes.slice(0,8000):'',validated:v.validated===true};
+ }
+ for(const t of data.tests.slice(0,2500)){
+  if(!skillsById[t.code])continue;
+  const score=Number(t.score);
+  if(!Number.isFinite(score)||score<0||score>20)continue;
+  result.tests.push({id:typeof t.id==='string'?t.id.slice(0,100):uniqueId(),code:t.code,
+   date:validDate(t.date)?t.date:'',title:String(t.title||'').slice(0,220),score,
+   assistance:['sans aide','documentation','aide extérieure'].includes(t.assistance)?t.assistance:'sans aide',
+   notes:String(t.notes||'').slice(0,12000)});
+ }
+ if(Array.isArray(data.milestones)) result.milestones=result.milestones.map((_,i)=>data.milestones[i]===true);
+ for(const skill of SPEC.skills)if(!canConfirmFromTests(result.tests,skill.id))result.skills[skill.id].validated=false;
+ return result;
+}
+function validDate(value){return typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&!Number.isNaN(Date.parse(value));}
+function uniqueId(){return 't-'+Date.now()+'-'+Math.random().toString(36).slice(2,10);}
+function restore(){
+ try{const saved=localStorage.getItem(STORAGE_KEY);if(saved)state=normalized(JSON.parse(saved));
+  $('saveStatus').textContent=saved?'Séance restaurée':'Nouveau carnet';}
+ catch(e){$('saveStatus').textContent='Stockage local indisponible';saveEnabled=false;}
+}
+function save(){
+ if(!saveEnabled)return;
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));$('saveStatus').textContent='Sauvegardé localement';}
+ catch(e){saveEnabled=false;$('saveStatus').textContent='Stockage indisponible : exporter JSON';}
+}
+function node(tag,cls,parent,text){
+ const x=document.createElement(tag);if(cls)x.className=cls;
+ if(text!==undefined)x.textContent=text;
+ if(parent)parent.appendChild(x);return x;
+}
+function button(label,parent,callback,cls='btn'){
+ const b=node('button',cls,parent,label);b.type='button';b.addEventListener('click',callback);return b;
+}
+function link(url,label,parent){const a=node('a','',parent,label);a.href=url;a.target='_blank';a.rel='noopener noreferrer';return a;}
+function elLabel(parent,text,target){const lab=node('label','',parent,text);if(target)lab.htmlFor=target;return lab;}
+function sectionTitle(root,kicker,title,intro){node('div','eyebrow',root,kicker);node('h2','',root,title);if(intro)node('p','intro',root,intro);}
+function show(name,value=''){
+ view.name=name;view.value=value;
+ renderNavigation();renderContent();window.scrollTo({top:0,behavior:'instant'});
+}
+function blockSkills(id){return SPEC.skills.filter(s=>s.domain===id);}
+function testsFor(code){return state.tests.filter(t=>t.code===code);}
+function latestTest(code){return testsFor(code).slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id))[0]||null;}
+function canConfirmFromTests(tests,code){
+ const passed=tests.filter(t=>t.code===code&&t.score>=12&&validDate(t.date));
+ return passed.some((a,i)=>passed.some((b,j)=>i!==j&&a.date!==b.date&&(a.assistance==='sans aide'||b.assistance==='sans aide')));
+}
+function level(score){return score===null||score===undefined?'NE':score<8?'R':score<12?'J':score<16?'V':'V+';}
+function levelClass(label){return label==='V+'?'Vplus':label;}
+function badge(label,parent){return node('span','statuspill '+levelClass(label),parent,label);}
+function metrics(){
+ const worked=SPEC.skills.filter(s=>state.skills[s.id].worked).length;
+ const tested=SPEC.skills.filter(s=>latestTest(s.id)).length;
+ const passed=SPEC.skills.filter(s=>{const t=latestTest(s.id);return t&&t.score>=12;}).length;
+ const validated=SPEC.skills.filter(s=>state.skills[s.id].validated).length;
+ return {worked,tested,passed,validated};
+}
+function getStatus(s){
+ const last=latestTest(s.id);
+ if(!last)return state.skills[s.id].worked?'Travaillé · non évalué':'À étudier';
+ return 'Test '+level(last.score)+' · '+last.score.toLocaleString('fr-FR')+'/20';
+}
+function renderNavigation(){
+ const root=$('navigation');root.replaceChildren();const m=metrics();
+ $('sideProgress').textContent=m.worked+' / '+SPEC.skills.length+' compétences travaillées';
+ $('sideBar').style.width=(100*m.worked/SPEC.skills.length).toFixed(1)+'%';
+ button('Vue d’ensemble',root,()=>show('home'),'navbtn'+(view.name==='home'?' active':''));
+ button('Toutes les compétences',root,()=>show('list'),'navbtn'+(view.name==='list'?' active':''));
+ for(const b of SPEC.blocks){
+  const list=blockSkills(b.id),done=list.filter(s=>state.skills[s.id].worked).length;
+  const bt=button(b.id+' · '+b.title,root,()=>show('block',b.id),'navbtn'+(view.name==='block'&&view.value===b.id?' active':''));
+  node('small','',bt,done+'/'+list.length);
+ }
+ node('div','nav-title',root,'Évaluations et repères');
+ button('Historique des tests',root,()=>show('history'),'navbtn'+(view.name==='history'?' active':''));
+ button('Méthode et jalons',root,()=>show('method'),'navbtn'+(view.name==='method'?' active':''));
+}
+function renderContent(){
+ const root=$('content');root.replaceChildren();
+ if(view.name==='home')renderHome(root);
+ else if(view.name==='list')renderList(root);
+ else if(view.name==='block')renderBlock(root,view.value);
+ else if(view.name==='skill')renderSkill(root,view.value);
+ else if(view.name==='history')renderHistory(root);
+ else if(view.name==='method')renderMethod(root);
+}
+function progress(parent,part,total){
+ const bar=node('div','progressbar',parent),fill=node('div','',bar);
+ fill.style.width=total?((100*part/total).toFixed(1)+'%'):'0%';
+}
+function renderHome(root){
+ sectionTitle(root,'Tableau de bord','CAPET SII 2027 · Suivi des acquis','Les 34 compétences et les 8 domaines sont repris du document Word. Tu peux travailler une notion, demander un test, puis enregistrer la note obtenue après correction.');
+ const m=metrics(),tiles=node('div','tiles',root);
+ for(const [value,label] of [[m.worked+'/34','Compétences travaillées'],[m.tested+'/34','Compétences évaluées'],[m.passed+'/34','Dernier test ≥ 12/20'],[m.validated+'/34','Acquis confirmés (déclarés)']]){
+  const t=node('div','tile',tiles);node('strong','',t,value);node('span','',t,label);
+ }
+ const notice=node('div','notice',root);
+ node('strong','',notice,'Attention au niveau de maîtrise : ');
+ notice.append('une lecture ne vaut pas validation. Les notes apparaissent uniquement après une évaluation renseignée. « Acquis confirmé » reste une validation personnelle après réussite à un exercice voisin et contrôle ultérieur.');
+ node('h3','',root,'Les huit domaines');const grid=node('div','domains',root);
+ for(const b of SPEC.blocks){
+  const list=blockSkills(b.id),worked=list.filter(s=>state.skills[s.id].worked).length,tested=list.filter(s=>latestTest(s.id)).length;
+  const card=node('div','domain',grid),head=node('div','head',card);
+  node('strong','',head,b.id+' · '+b.title);node('span','badge '+b.priority.toLowerCase(),head,b.priority);
+  node('p','',card,worked+'/'+list.length+' travaillées · '+tested+' évaluées');progress(card,worked,list.length);
+  button('Ouvrir ce domaine',card,()=>show('block',b.id),'btn small');
+ }
+ node('h3','',root,'Pour commencer');
+ const tip=node('div','tip',root);
+ tip.append('Diagnostic initial proposé dans le document : ');
+ for(const id of ['B1','C1','D1']){
+  const b=button(id,tip,()=>show('skill',id),'btn small');b.style.margin='0 4px';
+ }
+ const actions=node('div','actions',root);
+ button('Voir toutes les compétences',actions,()=>show('list'),'btn primary');
+ button('Enregistrer un test',actions,()=>show('history'));
+ button('Méthode de travail et jalons',actions,()=>show('method'));
+}
+function renderList(root){
+ sectionTitle(root,'Liste de travail','Toutes les compétences','Recherche et filtres : P1 = priorité de travail ; P2 = consolidation. Les niveaux R / J / V / V+ ne sont affichés qu’après un test enregistré.');
+ const fl=node('div','filterbar',root);
+ const input=node('input','',fl);input.type='search';input.placeholder='Rechercher : C++, GPIO, réseau…';input.setAttribute('aria-label','Rechercher une compétence');input.value=globalFilters.query;
+ const p=node('select','',fl),s=node('select','',fl);
+ for(const [v,l] of [['all','Toutes priorités'],['P1','Priorité P1'],['P2','Priorité P2']])option(p,v,l);
+ for(const [v,l] of [['all','Tous les états'],['todo','À étudier'],['worked','Travaillé sans test'],['tested','Déjà évalué']])option(s,v,l);
+ p.value=globalFilters.priority;s.value=globalFilters.stage;
+ const count=node('p','subtle',root,''),grid=node('div','skillgrid',root);
+ function refresh(){
+  grid.replaceChildren();const q=globalFilters.query.trim().toLowerCase();
+  const list=SPEC.skills.filter(x=>(globalFilters.priority==='all'||globalFilters.priority===x.priority)&&
+   (globalFilters.stage==='all'||(globalFilters.stage==='tested'&&latestTest(x.id))||
+   (globalFilters.stage==='worked'&&state.skills[x.id].worked&&!latestTest(x.id))||
+   (globalFilters.stage==='todo'&&!state.skills[x.id].worked&&!latestTest(x.id)))&&
+   (!q||(x.id+' '+x.label+' '+SPEC.blocks.find(b=>b.id===x.domain).title).toLowerCase().includes(q)));
+  count.textContent=list.length+' compétence(s) affichée(s)';
+  for(const x of list)renderSkillTile(x,grid);
+  if(!list.length)node('p','empty',grid,'Aucune compétence ne correspond à ces filtres.');
+ }
+ input.addEventListener('input',()=>{globalFilters.query=input.value;refresh();});
+ p.addEventListener('change',()=>{globalFilters.priority=p.value;refresh();});
+ s.addEventListener('change',()=>{globalFilters.stage=s.value;refresh();});
+ refresh();
+}
+function option(select,value,label){const x=node('option','',select,label);x.value=value;}
+function renderSkillTile(x,parent){
+ const box=node('div','skillrow',parent),mid=node('main','',box);
+ const t=node('div','row',mid);node('strong','',t,x.id+' · '+x.label);node('span','badge '+x.priority.toLowerCase(),t,x.priority);
+ node('p','',mid,getStatus(x));
+ const latest=latestTest(x.id);if(latest)badge(level(latest.score),mid);
+ button('Ouvrir / suivre',mid,()=>show('skill',x.id),'btn small');
+}
+function renderBlock(root,id){
+ const b=SPEC.blocks.find(x=>x.id===id);if(!b){show('home');return;}
+ sectionTitle(root,'Domaine '+id,b.title,'Toutes les compétences de ce domaine, avec les priorités conseillées dans le carnet d’origine.');
+ const all=blockSkills(id),done=all.filter(s=>state.skills[s.id].worked).length,evaluated=all.filter(s=>latestTest(s.id)).length;
+ node('p','subtle',root,done+'/'+all.length+' travaillées · '+evaluated+' évaluées');progress(root,done,all.length);
+ const grid=node('div','skillgrid',root);for(const x of all)renderSkillTile(x,grid);
+ const actions=node('div','actions',root);button('Retour au tableau de bord',actions,()=>show('home'));
+}
+function renderSkill(root,id){
+ const s=skillsById[id];if(!s){show('home');return;}
+ sectionTitle(root,'Compétence '+id,s.label,'Domaine : '+SPEC.blocks.find(b=>b.id===s.domain).title);
+ const row=node('div','row',root);node('span','badge '+s.priority.toLowerCase(),row,'Priorité '+s.priority);const last=latestTest(id);
+ if(last){badge(level(last.score),row);node('span','meta',row,'Dernier résultat : '+last.score.toLocaleString('fr-FR')+'/20 · '+(last.date||'date non précisée'));}
+ else node('span','meta',row,'Non évalué (NE)');
+ const sheet=node('div','panel',root);
+ const check=node('label','check',sheet);const cb=node('input','',check);cb.type='checkbox';cb.checked=state.skills[id].worked;
+ node('span','',check,'J’ai étudié ou travaillé cette compétence');
+ cb.addEventListener('change',()=>{state.skills[id].worked=cb.checked;save();renderNavigation();});
+ fieldTextarea(sheet,'Notes personnelles / points à approfondir',state.skills[id].notes,text=>{state.skills[id].notes=text;save();});
+ const confirm=node('label','check',sheet);const co=node('input','',confirm);co.type='checkbox';co.checked=state.skills[id].validated;
+ node('span','',confirm,'Acquis confirmé : deux réussites V/V+ à des dates différentes, dont une sans aide, et exercice voisin réussi');
+ co.addEventListener('change',()=>{
+  if(co.checked&&!canConfirmFromTests(state.tests,id)){
+   co.checked=false;alert('Pour confirmer, enregistre deux tests V ou V+ à des dates différentes, dont au moins un sans aide.');return;
+  }
+  state.skills[id].validated=co.checked;save();renderNavigation();
+ });
+ const btns=node('div','actions',root);
+ button('Copier une demande de test '+id,btns,()=>copyPrompt(id),'btn primary');
+ button('Voir le domaine '+s.domain,btns,()=>show('block',s.domain));
+ node('h3','',root,'Enregistrer un test corrigé');renderTestForm(root,id);
+ node('h3','',root,'Historique de cette compétence');renderTestTable(root,testsFor(id),false);
+}
+function fieldTextarea(parent,title,value,onChange){
+ const wrapper=node('div','field',parent);const id='field-'+(++fieldSequence);elLabel(wrapper,title,id);const ta=node('textarea','',wrapper);ta.id=id;ta.value=value;
+ ta.addEventListener('input',()=>onChange(ta.value));return ta;
+}
+function copyPrompt(id){
+ const msg='Fais-moi passer un test diagnostique CAPET SII option ingénierie informatique sur la compétence '+id+' : '+skillsById[id].label+' Corrige-moi ensuite sur 20 avec les erreurs, le niveau R/J/V/V+ et deux pistes de progression.';
+ if(navigator.clipboard&&window.isSecureContext){navigator.clipboard.writeText(msg).then(()=>alert('Demande de test copiée.')).catch(()=>fallbackCopy(msg));}
+ else fallbackCopy(msg);
+}
+function fallbackCopy(text){
+ const x=document.createElement('textarea');x.value=text;x.style.position='fixed';x.style.left='-9999px';document.body.append(x);x.select();
+ try{document.execCommand('copy');alert('Demande de test copiée.');}
+ catch(e){prompt('Copie cette demande :',text);}
+ x.remove();
+}
+function renderTestForm(parent,defaultCode){
+ const form=node('form','panel',parent);form.noValidate=true;
+ const grid=node('div','formgrid third',form);
+ const codeField=makeField(grid,'Code de compétence','select');
+ for(const s of SPEC.skills)option(codeField,s.id,s.id+' · '+s.label);
+ codeField.value=defaultCode||'B1';
+ const date=makeField(grid,'Date du test','date');date.value=new Date().toLocaleDateString('sv-SE');
+ const score=makeField(grid,'Note corrigée /20','number');score.min='0';score.max='20';score.step='0.5';score.placeholder='ex. 14';score.required=true;
+ const title=makeField(form,'Intitulé du test','text');title.placeholder='ex. Test GPIO et interruptions';
+ const assistance=makeField(form,'Conditions de passation','select');
+ for(const [v,label] of [['sans aide','Sans aide'],['documentation','Avec documentation'],['aide extérieure','Avec aide extérieure / IA']])option(assistance,v,label);
+ const notes=fieldTextarea(form,'Erreurs observées / prochaine action','',()=>{});
+ const row=node('div','actions',form);button('Enregistrer ce résultat',row,()=>{
+  const n=Number(score.value);
+  if(score.value.trim()===''||!Number.isFinite(n)||n<0||n>20){alert('Saisis une note comprise entre 0 et 20.');score.focus();return;}
+  if(!validDate(date.value)){alert('Renseigne une date valide.');date.focus();return;}
+  const code=codeField.value;if(!skillsById[code]){alert('Code inconnu');return;}
+  state.tests.push({id:uniqueId(),code,date:date.value,title:title.value.trim(),score:n,assistance:assistance.value,notes:notes.value});
+  save();renderNavigation();renderContent();
+ },'btn primary');
+ node('p','meta',form,'À renseigner après correction. Pour les diagnostics C/C++/Python notés sur 100, un report sur 20 est possible, à condition de conserver le barème et les conditions de passation.');
+}
+function makeField(parent,label,type){
+ const wrap=node('div','field',parent);const id='field-'+(++fieldSequence);elLabel(wrap,label,id);let e;
+ if(type==='select')e=node('select','',wrap);
+ else{e=node('input','',wrap);e.type=type;}
+ e.id=id;return e;
+}
+function renderTestTable(parent,tests,showCode=true){
+ const ordered=tests.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id));
+ if(!ordered.length){node('p','empty',parent,'Aucun résultat enregistré pour le moment.');return;}
+ const box=node('div','tablewrap',parent),table=node('table','',box),head=node('thead','',table),hr=node('tr','',head);
+ for(const x of ['Date',...(showCode?['Code']:[]),'Test / exercice','/20','Niveau','Conditions / suite',''])node('th','',hr,x);
+ const body=node('tbody','',table);
+ for(const t of ordered){
+  const tr=node('tr','',body);node('td','',tr,t.date||'—');
+  if(showCode){const cell=node('td','',tr);button(t.code,cell,()=>show('skill',t.code),'btn small');}
+  node('td','',tr,t.title||'Test');node('td','',tr,String(t.score).replace('.',','));const l=node('td','',tr);badge(level(t.score),l);
+  const rest=node('td','',tr);node('div','meta',rest,t.assistance);if(t.notes)node('div','',rest,t.notes);
+  const a=node('td','actions-cell',tr);
+  button('Supprimer',a,()=>{
+   if(!confirm('Supprimer ce résultat ?'))return;
+   state.tests=state.tests.filter(x=>x.id!==t.id);
+   if(!canConfirmFromTests(state.tests,t.code))state.skills[t.code].validated=false;
+   save();renderNavigation();renderContent();
+  },'btn small danger');
+ }
+}
+function renderHistory(root){
+ sectionTitle(root,'Évaluations','Journal des tests','Chaque test corrigé est conservé. Les résultats antérieurs ne sont jamais écrasés par une nouvelle passation.');
+ node('h3','',root,'Ajouter un résultat');renderTestForm(root,'B1');
+ node('h3','',root,'Historique complet ('+state.tests.length+')');renderTestTable(root,state.tests,true);
+ const n=node('div','notice',root);n.append('Échelle personnelle : NE (non évalué), R (0–7/20), J (8–11/20), V (12–15/20), V+ (16–20/20). Après R/J, reprendre la notion. Après V/V+, refaire un test distinct à distance.');
+}
+function renderMethod(root){
+ sectionTitle(root,'Mode d’emploi','Méthode et jalons','Consignes et repères transposés du document Word transmis.');
+ node('h3','',root,'Rythme hebdomadaire proposé');
+ const cadence=node('div','panel',root);node('p','',cadence,'Base ajustable : 3 heures par semaine — 1 h 15 sur une notion prioritaire, 45 min d’exercice / TP et 1 h de problème de concours ou de test corrigé.');
+ node('h3','',root,'Protocole d’évaluation');
+ for(const line of SPEC.protocol)node('p','',root,'• '+line);
+ const aside=node('div','tip',root);aside.append('Méthode : choisir un code (ex. C2), étudier le thème, demander « Fais-moi passer le test C2 », puis reporter la date, la note et la suite à travailler.');
+ node('h3','',root,'Prochains jalons');
+ for(let i=0;i<SPEC.milestones.length;i++){
+  const lab=node('label','check panel',root),check=node('input','',lab);check.type='checkbox';check.checked=state.milestones[i];
+  node('span','',lab,SPEC.milestones[i]);check.addEventListener('change',()=>{state.milestones[i]=check.checked;save();});
+ }
+ node('h3','',root,'Repères pour les épreuves bac+3');
+ node('p','',root,'Admissibilité : 2 écrits de 4 h (coefficients 3 et 2), modélisation d’un produit et résolution de problème.');
+ node('p','',root,'Admission : étude expérimentale (4 h de TP + 20 min d’exposé + 40 min d’échange ; coefficient 5) et entretien (35 min ; coefficient 3), incluant motivation, valeurs de la République, déontologie et enjeux du métier.');
+ node('h3','',root,'Liens figurant dans le document d’origine');
+ const ul=node('ul','',root);for(const ref of SPEC.references){const li=node('li','',ul);link(ref.url,ref.text,li);}
+ const actions=node('div','actions',root);button('Exporter le carnet JSON',actions,exportJSON,'btn primary');button('Importer une sauvegarde',actions,()=>openImport());button('Réinitialiser toutes les données',actions,resetAll,'btn danger');
+}
+function exportJSON(){
+ const payload={...state,date_export:new Date().toISOString(),source:'CAPET_SII_Ingenierie_Informatique_2027_Suivi(2).docx',
+  description:'Carnet personnel et résultats saisis après correction'};
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+ const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;
+ a.download='CAPET_2027_carnet_suivi_'+new Date().toLocaleDateString('sv-SE')+'.json';
+ document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);
+}
+function openImport(){$('jsonFile').click();}
+async function importJSON(file){
+ if(!file)return;
+ try{
+  if(file.size>6*1024*1024)throw new Error('Fichier trop volumineux (limite 6 Mo).');
+  const loaded=normalized(JSON.parse(await file.text()));
+  if(!confirm('Importer cette sauvegarde ? Cela remplacera toutes les données locales actuelles.'))return;
+  state=loaded;save();renderNavigation();renderContent();alert('Sauvegarde importée.');
+ }catch(e){alert('Import impossible : '+e.message);}
+ finally{$('jsonFile').value='';}
+}
+function resetAll(){
+ if(!confirm('Effacer localement toutes les compétences cochées et les résultats des tests ? Exporte d’abord un JSON si nécessaire.'))return;
+ state=freshState();save();show('home');
+}
+$('exportSide').addEventListener('click',exportJSON);
+$('importSide').addEventListener('click',openImport);
+$('jsonFile').addEventListener('change',e=>importJSON(e.target.files[0]));
+restore();renderNavigation();renderContent();
+</script>
+</body>
+</html>

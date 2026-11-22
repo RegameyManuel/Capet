@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CAPET – Diagnostic Python — 3.11+</title>
+<style>
+:root{--ink:#15233a;--sub:#53647a;--accent:#086e82;--accent2:#0b5566;--bg:#f2f5f8;--card:#ffffff;--line:#dbe3ec;--muted:#edf3f6;--good:#27764a;--warning:#99561a;--font:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.53 var(--font)}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.4}button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #4caec4;outline-offset:2px}
+.top{background:#102b3b;color:white;padding:18px max(20px,calc((100vw - 1400px)/2));display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap}.top h1{margin:0;font-size:21px}.top small{color:#c0d6e1;font-weight:500}.topright{display:flex;align-items:center;flex-wrap:wrap;gap:10px}.topright span{font-variant-numeric:tabular-nums}.tag{background:#215467;color:#c9eaf0;padding:4px 9px;border-radius:999px;font-size:12px}
+.layout{max-width:1400px;margin:0 auto;padding:22px 18px;display:grid;grid-template-columns:275px minmax(0,1fr);gap:20px}.sidebar,.sheet{background:var(--card);border:1px solid var(--line);border-radius:13px;box-shadow:0 2px 12px #16223b08}.sidebar{padding:18px;align-self:start;position:sticky;top:14px;max-height:calc(100vh - 28px);overflow:auto}.sidebar strong{font-size:15px}.subtle{color:var(--sub);font-size:13px}.progressbar{margin:8px 0 6px;background:#e6ecef;border-radius:8px;height:9px;overflow:hidden}.progressbar>div{height:100%;width:0%;background:var(--accent);transition:width .2s}.nav-group{margin-top:20px}.nav-group h3{font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--sub);margin:0 0 6px}.navbtn{display:flex;width:100%;align-items:center;gap:8px;text-align:left;padding:9px 10px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--ink)}.navbtn:hover{background:var(--muted)}.navbtn.active{border-color:#b6d5db;background:#e6f4f5;color:#075265;font-weight:650}.status-dot{width:9px;height:9px;border-radius:50%;flex:none;background:#c4ced7}.status-dot.done{background:var(--good)}.status-dot.review{background:#db983c}.score{margin-left:auto;font-size:12px;color:var(--sub)}.sidebar-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.sheet{min-height:650px;padding:28px 32px}.eyebrow{color:var(--accent);font-weight:750;text-transform:uppercase;letter-spacing:.06em;font-size:12px}.question-title{font-size:23px;line-height:1.25;margin:7px 0 5px}.badge{display:inline-block;border-radius:5px;background:#eaf4f7;color:#075b70;font-weight:700;padding:3px 8px;font-size:12px}.intro{margin-top:0;color:var(--sub)}.prompt{background:#f4f7fa;border-left:4px solid var(--accent);padding:14px 16px;margin:16px 0 16px;border-radius:0 7px 7px 0;font-weight:580;white-space:pre-wrap}.statement p{margin:11px 0}.statement ul{padding-left:25px;margin:7px 0 13px}.statement li{margin:5px 0}pre{background:#172536;color:#eff5fa;border:1px solid #293f54;border-radius:9px;padding:18px;overflow:auto;font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;tab-size:4;white-space:pre;max-height:460px}code{font-family:ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}.field{margin:18px 0}.field label{display:block;font-weight:700;margin-bottom:7px}.field .help{font-weight:400;font-size:12px;color:var(--sub)}textarea,input[type=text],select{width:100%;border:1px solid #bdcdd9;border-radius:8px;padding:11px 13px;background:#fff;color:var(--ink)}textarea{resize:vertical;min-height:130px;line-height:1.5}textarea.editor{font:13px/1.55 ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;min-height:235px;tab-size:4}textarea.answer{min-height:160px}.controls{display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:14px 0;border-top:1px solid var(--line);margin-top:20px}.check{display:flex;align-items:center;gap:8px;cursor:pointer}.check input{width:17px;height:17px;accent-color:var(--accent)}.controls select{width:170px;padding:7px}.buttons{display:flex;flex-wrap:wrap;gap:9px;margin:24px 0 0;align-items:center}.buttons .push{margin-left:auto}.btn{background:white;border:1px solid #c9d5df;color:var(--ink);border-radius:8px;padding:9px 14px;font-weight:650}.btn.primary{background:var(--accent);border-color:var(--accent);color:white}.btn.primary:hover{background:var(--accent2)}.btn:hover{background:#f0f6f8}.btn.ghost{background:none;border-color:transparent;color:var(--sub)}.btn.small{padding:6px 10px;font-size:12px}.panel{border:1px solid var(--line);border-radius:11px;padding:16px;margin:17px 0;background:#fbfdff}.panel h3{margin:0 0 10px;font-size:16px}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.note{font-size:13px;color:var(--sub)}.notice{border-left:4px solid #d69b31;background:#fff8e8;padding:11px 14px;border-radius:0 7px 7px 0;margin:16px 0}.success{color:var(--good)}.warning{color:var(--warning)}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.reviewitem{display:grid;grid-template-columns:80px 1fr 75px;gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}.reviewitem small{color:var(--sub)}.reviewitem .btn{width:100%;padding:6px}.footer{max-width:1400px;margin:0 auto 28px;padding:0 22px;color:var(--sub);font-size:12px}.hidden{display:none!important}
+@media(max-width:820px){.layout{grid-template-columns:1fr;padding:12px}.sidebar{position:static;max-height:none}.sheet{padding:20px 17px;min-height:400px}.grid2{grid-template-columns:1fr}.top{padding:16px}.buttons .push{margin-left:0}}@media print{body{background:white}.top,.sidebar,.buttons,.footer,.controls{display:none!important}.layout{display:block;padding:0}.sheet{border:none;box-shadow:none;padding:0;min-height:0}textarea{border:1px solid #ddd}.question-title{font-size:18px}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div><small>CAPET SII · ingénierie informatique · diagnostic individuel</small><h1 id="pageTitle"></h1></div>
+  <div class="topright"><span class="tag">100 points · hors ligne</span><span id="clock" aria-label="Temps actif">00:00:00</span><button type="button" class="btn small" id="timerBtn">Démarrer le temps</button><span id="saveStatus" style="font-size:12px;color:#c0d6e1">—</span></div>
+</header>
+<main class="layout">
+  <aside class="sidebar" aria-label="Navigation dans l'évaluation">
+    <strong>Progression</strong><p class="subtle" id="progressText">0 / 12 exercices terminés</p>
+    <div class="progressbar" aria-hidden="true"><div id="progressFill"></div></div>
+    <div id="navigation"></div>
+    <div class="sidebar-actions"><button class="btn small" id="goProfile">Passation</button><button class="btn small" id="goReview">Bilan / Export</button></div>
+    <p class="subtle">● Vert : réponse marquée terminée.<br>● Orange : à revoir.<br>Gris : non terminé.</p>
+  </aside>
+  <section class="sheet" id="content" aria-live="polite"></section>
+</main>
+<footer class="footer">Fichier HTML autonome. Les réponses restent sur cet appareil jusqu’à l’export JSON. L’évaluation est corrigée ultérieurement par un examinateur, jamais par une note automatique basée sur la longueur des réponses.</footer>
+<input id="importFile" class="hidden" type="file" accept=".json,application/json">
+<script id="examData" type="application/json">{"id":"PY","label":"Python","title":"Python — 3.11+","duration":"2 h 30 à 3 h","points_total":100,"sections":[{"id":"PY1","title":"Concepts et sémantique","points":15,"intro":"Comprendre objets, références, exceptions et itération."},{"id":"PY2","title":"Lecture de code et raisonnement","points":20,"intro":"Donne les sorties sans exécuter d’abord."},{"id":"PY3","title":"Débogage et gestion des erreurs","points":20,"intro":"Corriger sans masquer les cas limites."},{"id":"PY4","title":"Programmation complète : mini-enregistreur de mesures","points":35,"intro":""},{"id":"PY5","title":"Architecture de programme embarqué","points":10,"intro":"Concevoir un programme qui puisse être maintenu et diagnostiqué."}],"questions":[{"id":"PY1.1","section":"PY1","points":3,"prompt":"Explique la différence entre == et is. Donne un exemple où les confondre conduit à un défaut, et un cas où is est approprié.","blocks":[],"kind":"normal","needs_code":false,"needs_tests":false,"code_language":"python"},{"id":"PY1.2","section":"PY1","points":3,"prompt":"Explique le risque d’un argument par défaut mutable, avec un exemple simple. Donne une écriture sûre.","blocks":[],"kind":"normal","needs_code":false,"needs_tests":false,"code_language":"python"},{"id":"PY1.3","section":"PY1","points":3,"prompt":"Différencie itérable, itérateur et générateur. Quel est l’intérêt de yield pour traiter un flux de données ?","blocks":[],"kind":"normal","needs_code":false,"needs_tests":false,"code_language":"python"},{"id":"PY1.4","section":"PY1","points":3,"prompt":"À quoi sert if __name__ == \"__main__\": dans un module réutilisable ?","blocks":[],"kind":"normal","needs_code":false,"needs_tests":false,"code_language":"python"},{"id":"PY1.5","section":"PY1","points":3,"prompt":"Distingue exception, erreur métier et valeur manquante (None). Pourquoi éviter except Exception: pass dans un système de mesures ?","blocks":[],"kind":"normal","needs_code":false,"needs_tests":false,"code_language":"python"},{"id":"PY2.1","section":"PY2","points":10,"prompt":"Prédire exactement les deux listes affichées, et expliquer alias, copie superficielle et mutation.","blocks":[{"type":"code","text":"data = [1, 2, 3]\nref = data\ncopie = data[:]\nref.append(4)\ncopie[0] = 9\nprint(data)\nprint(copie)"}],"kind":"normal","needs_code":false,"needs_tests":false,"code_language":"python"},{"id":"PY2.2","section":"PY2","points":10,"prompt":"Prédire la sortie exacte, expliquer la capture de la variable i, puis modifier une seule ligne pour obtenir [10, 11, 12].","blocks":[{"type":"code","text":"def fabrique():\n    return [lambda x: x + i for i in range(3)]\n \nfonctions = fabrique()\nprint([f(10) for f in fonctions])"}],"kind":"normal","needs_code":true,"needs_tests":false,"code_language":"python"},{"id":"PY3.1","section":"PY3","points":10,"prompt":"Explique le défaut et la sortie surprenante des deux appels suivants. Réécris ajout_mesure de sorte que deux appels sans argument de liste ne partagent aucun état, tout en acceptant éventuellement une liste fournie par l’appelant.","blocks":[{"type":"code","text":"def ajout_mesure(x, mesures=[]):\n    mesures.append(x)\n    return mesures\n \nprint(ajout_mesure(10))\nprint(ajout_mesure(20))"}],"kind":"normal","needs_code":true,"needs_tests":false,"code_language":"python"},{"id":"PY3.2","section":"PY3","points":10,"prompt":"La fonction ci-dessous est censée calculer une moyenne. Pourquoi échoue-t-elle ou donne-t-elle un diagnostic pauvre pour certaines entrées ? Propose une version claire acceptant un itérable de nombres consommé une seule fois et levant ValueError si l’itérable est vide. Ajoute deux tests.","blocks":[{"type":"code","text":"def moyenne(valeurs):\n    total = 0\n    for v in valeurs:\n        total += v\n    return total / len(valeurs)"}],"kind":"normal","needs_code":true,"needs_tests":false,"code_language":"python"},{"id":"PY4","section":"PY4","points":35,"prompt":"Programmation complète : mini-enregistreur de mesures","blocks":[{"type":"text","text":"Concevoir du code structuré, robuste et testable avec des fichiers CSV."},{"type":"bullet","text":"Implémente parse_measurements(text: str) -\u003e list[tuple[int, str, float]]. Le texte est un CSV à séparateur « ; » ; la première ligne est exactement ts_ms;sensor;value et doit être ignorée. Les lignes blanches peuvent être ignorées."},{"type":"bullet","text":"Chaque mesure comprend un timestamp entier positif ou nul, un nom de capteur non vide (espaces périphériques supprimés), et un nombre réel fini. Une ligne mal formée doit lever ValueError en mentionnant son numéro (numérotation du fichier à partir de 1). Les doublons de timestamp sont autorisés. Préserve l’ordre des lignes."},{"type":"bullet","text":"Implémente summarize(readings) -\u003e dict[str, dict[str, float | int]] retournant pour chaque capteur les quatre clés count, mean, min, max. Une liste vide donne {}."},{"type":"bullet","text":"Implémente latest(readings, sensor) -\u003e tuple[int, str, float] | None : relevé du capteur ayant le timestamp le plus élevé ; en cas d’égalité, retenir le dernier rencontré."},{"type":"bullet","text":"Ajoute au moins six tests (dont entrée vide avec en-tête valide, mesure invalide, plusieurs capteurs, égalité de timestamp). Évite les dépendances externes et la lecture de fichiers réels : une chaîne de caractères suffit."},{"type":"code","text":"ts_ms;sensor;value\n1000;temp;20.0\n1200;light;90\n1500;temp;22.0\n1000;temp;19.0"},{"type":"text","text":"Attendus sur cet exemple : temp a count = 3, min = 19, max = 22 et mean = 61/3 ; light a count = 1. latest(..., \"temp\") renvoie le relevé de timestamp 1500, valeur 22.0."}],"kind":"project","needs_code":true,"needs_tests":true,"code_language":"python"},{"id":"PY5.1","section":"PY5","points":6,"prompt":"Un Raspberry Pi reçoit 50 lignes/s au format sensor;valeur via un port série, et doit enregistrer les données sans perdre le flux. Propose une architecture de fonctions ou de classes, et explique comment tu gères bufferisation, fichiers, erreurs de décodage et arrêt propre.","blocks":[],"kind":"normal","needs_code":false,"needs_tests":false,"code_language":"python"},{"id":"PY5.2","section":"PY5","points":4,"prompt":"Propose deux stratégies de test sans matériel physique pour vérifier le parseur du flux série et la logique d’enregistrement. Précise comment simuler une erreur ou une coupure de communication.","blocks":[],"kind":"normal","needs_code":false,"needs_tests":false,"code_language":"python"}],"instructions":["Passe les trois épreuves à des moments différents ; l’ordre C → C++ → Python est conseillé.","Pour obtenir un diagnostic fiable, commence sans IA, sans moteur de recherche et sans exécuter les extraits de lecture de code. Note honnêtement les questions non maîtrisées.","Pour les problèmes de programmation, écris d’abord ton raisonnement et ton code seul. Tu pourras compiler ou exécuter ensuite : signale alors les erreurs et corrections effectuées.","Réponds en conservant les identifiants des questions (ex. C2.1, CPP4, PY3.2). Pour le code, joins les fichiers .c, .cpp ou .py, ou colle-les dans la conversation.","L’évaluation mesure la compréhension et la robustesse : une solution lisible et correctement justifiée vaut mieux qu’un code inutilement compliqué."],"hypothesis":"Hypothèses : Python 3.11 ou plus récent. Tu peux utiliser typing, csv, io, dataclasses, math, unittest/pytest seulement si déjà disponible. Les paquets tiers ne sont pas nécessaires."}</script>
+<script>
+"use strict";
+/*
+ * Outil d'évaluation personnel hors ligne.
+ * - Aucune dépendance et aucun appel réseau.
+ * - Une seule structure SPEC pour le contenu ; le moteur est commun aux 3 langages.
+ * - Sauvegarde locale facultative + export/import JSON explicites.
+ * - Aucune correction automatique des réponses ouvertes ni du code source.
+ */
+const SPEC = JSON.parse(document.getElementById('examData').textContent);
+const STORAGE_KEY = 'capet-diagnostic-hors-ligne-' + SPEC.id + '-v1';
+const $ = id => document.getElementById(id);
+const qs = SPEC.questions;
+const indices = Object.fromEntries(qs.map((q, i) => [q.id, i]));
+
+function emptyResponse(){
+    return {text:'', code:'', tests:'', confidence:'', completed:false, review:false};
+}
+function emptyState(){
+    return {
+        version:1, examId:SPEC.id, position:0, elapsedSeconds:0, running:false,
+        startedAt:'', metadata:{name:'', assistance:'', compilation:'non', assurance:'',
+                                 pointsForts:'', difficultes:'', priorites:'', remarque:''},
+        answers:Object.fromEntries(qs.map(q=>[q.id, emptyResponse()]))
+    };
+}
+let state = emptyState();
+let savePossible = true;
+let lastTick = null;
+
+function normalizeState(data){
+    if(!data || data.examId !== SPEC.id) throw new Error('Ce JSON ne correspond pas à cette épreuve (' + SPEC.label + ').');
+    let fresh=emptyState();
+    fresh.position = (data.position === 'profile' || data.position === 'review') ? data.position :
+                    (Number.isInteger(data.position) && data.position >= 0 && data.position < qs.length ? data.position : 0);
+    fresh.elapsedSeconds = Math.max(0,Math.round(Number(data.elapsedSeconds)||0));
+    fresh.startedAt = typeof data.startedAt === 'string' ? data.startedAt : '';
+    fresh.running = false; // Ne compte jamais le temps pendant que le navigateur était fermé.
+    for(const key of Object.keys(fresh.metadata)) {
+        if(typeof data.metadata?.[key] === 'string') fresh.metadata[key]=data.metadata[key];
+    }
+    for(const q of qs) {
+        const v=data.answers?.[q.id];
+        if(!v) continue;
+        for(const prop of ['text','code','tests','confidence'])
+            if(typeof v[prop] === 'string') fresh.answers[q.id][prop] = v[prop];
+        fresh.answers[q.id].completed=Boolean(v.completed);
+        fresh.answers[q.id].review=Boolean(v.review);
+    }
+    return fresh;
+}
+function loadLocal(){
+    try{
+        const s=localStorage.getItem(STORAGE_KEY);
+        if(s) state=normalizeState(JSON.parse(s));
+        $('saveStatus').textContent=s ? 'Séance locale retrouvée' : 'Nouvelle séance';
+    } catch(e) {
+        savePossible=false;
+        $('saveStatus').textContent='Sauvegarde locale indisponible : exporter le JSON';
+    }
+}
+function saveLocal(){
+    if(!savePossible) return;
+    try{
+        const copy={...state,running:false};
+        localStorage.setItem(STORAGE_KEY,JSON.stringify(copy));
+        $('saveStatus').textContent='Sauvegardé sur cet appareil';
+    }catch(e){
+        savePossible=false;
+        $('saveStatus').textContent='Sauvegarde indisponible : exporter le JSON';
+    }
+}
+function markStarted(){
+    if(!state.startedAt) state.startedAt = new Date().toISOString();
+}
+function startTimer(){
+    markStarted(); state.running=true; lastTick=Date.now(); updateTimer();saveLocal();
+}
+function stopTimer(){
+    updateTimer();state.running=false;lastTick=null; updateTimer();saveLocal();
+}
+function updateTimer(){
+    if(state.running && lastTick !== null){
+        const now=Date.now();
+        const delta=Math.floor((now-lastTick)/1000);
+        if(delta>0){ state.elapsedSeconds += delta;lastTick += delta*1000; }
+    }
+    const t=state.elapsedSeconds;
+    $('clock').textContent=[Math.floor(t/3600),Math.floor(t%3600/60),t%60].map(x=>String(x).padStart(2,'0')).join(':');
+    $('timerBtn').textContent=state.running ? 'Mettre en pause' : (t ? 'Reprendre le temps' : 'Démarrer le temps');
+}
+setInterval(()=>{ if(state.running){ updateTimer(); saveLocal(); }},1000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden && state.running)stopTimer();});
+$('timerBtn').addEventListener('click',()=>state.running ? stopTimer():startTimer());
+
+function el(tag,attributes={},text=null){
+    const e=document.createElement(tag);
+    for(const [k,v] of Object.entries(attributes)){
+        if(k==='class') e.className=v;
+        else if(k==='htmlFor') e.htmlFor=v;
+        else if(k==='checked') e.checked=v;
+        else e.setAttribute(k,v);
+    }
+    if(text!==null)e.textContent=text;
+    return e;
+}
+function add(parent, child){parent.appendChild(child);return child;}
+function paragraph(parent, content, cls){return add(parent,el('p',cls?{class:cls}:{},content));}
+function button(label,cls,onClick){const b=el('button',{type:'button',class:'btn '+(cls||'')},label);b.addEventListener('click',onClick);return b;}
+function getSection(id){return SPEC.sections.find(s=>s.id===id);}
+function answerHasText(a){return Boolean((a.text+a.code+a.tests).trim());}
+
+function renderNavigation(){
+    const nav=$('navigation');nav.replaceChildren();
+    const completed=qs.filter(q=>state.answers[q.id].completed).length;
+    $('progressText').textContent=completed+' / '+qs.length+' exercices marqués terminés';
+    $('progressFill').style.width=Math.round(100*completed/qs.length)+'%';
+    for(const sec of SPEC.sections){
+        const group=add(nav,el('div',{class:'nav-group'}));
+        add(group,el('h3',{},sec.id+' · '+sec.title));
+        for(const q of qs.filter(q=>q.section===sec.id)){
+            const a=state.answers[q.id];
+            const active=state.position===indices[q.id];
+            const b=add(group,el('button',{type:'button',class:'navbtn'+(active?' active':'')}));
+            add(b,el('span',{class:'status-dot'+(a.review?' review':a.completed?' done':'')}));
+            add(b,el('span',{},q.id));
+            add(b,el('span',{class:'score'},q.points+' pt'+(q.points===1?'':'s')));
+            b.title=q.prompt;b.addEventListener('click',()=>go(indices[q.id]));
+        }
+    }
+}
+function renderQuestion(){
+    const i=state.position, q=qs[i], a=state.answers[q.id], sec=getSection(q.section);
+    const root=$('content');root.replaceChildren();
+    add(root,el('div',{class:'eyebrow'},'Question '+(i+1)+' / '+qs.length+' · '+sec.title));
+    add(root,el('h2',{class:'question-title'},q.id+' — '+(q.kind==='project'?'Exercice de programmation complet':'Exercice')));
+    const marks=add(root,el('div',{class:'row'}));
+    add(marks,el('span',{class:'badge'},q.points+' points'));
+    add(marks,el('span',{class:'subtle'},'Barème déterminé après correction'));
+    if(sec.intro) paragraph(root,sec.intro,'intro');
+    add(root,el('div',{class:'prompt'},q.prompt));
+    const statement=add(root,el('div',{class:'statement'}));
+    let bulletList=null;
+    for(const block of q.blocks){
+        if(block.type==='bullet'){
+            if(!bulletList) bulletList=add(statement,el('ul'));
+            add(bulletList,el('li',{},block.text));
+        }else{
+            bulletList=null;
+            if(block.type==='code') add(add(statement,el('pre')),el('code',{},block.text));
+            else paragraph(statement,block.text);
+        }
+    }
+    addTextArea(root,q,a,'text','Réponse et raisonnement','Explique ton raisonnement, et note clairement les cas où tu hésites.',false);
+    if(q.needs_code) addTextArea(root,q,a,'code',q.kind==='project'?'Code complet':'Proposition de code / correction',
+         'Saisis ton code en texte brut. La touche Tab insère quatre espaces.',true);
+    if(q.needs_tests) addTextArea(root,q,a,'tests','Tests et cas limites',
+         'Écris les tests et justifie brièvement les cas couverts.',true);
+    const controls=add(root,el('div',{class:'controls'}));
+    const finish=add(controls,el('label',{class:'check'}));
+    const finishInput=add(finish,el('input',{type:'checkbox',checked:a.completed}));
+    add(finish,el('span',{},'Réponse terminée'));
+    finishInput.addEventListener('change',()=>{a.completed=finishInput.checked;markStarted();saveLocal();renderNavigation();});
+    const review=add(controls,el('label',{class:'check'}));
+    const reviewInput=add(review,el('input',{type:'checkbox',checked:a.review}));
+    add(review,el('span',{},'À revoir'));
+    reviewInput.addEventListener('change',()=>{a.review=reviewInput.checked;saveLocal();renderNavigation();});
+    add(controls,el('span',{class:'subtle'},'Confiance :'));
+    const conf=add(controls,el('select',{'aria-label':'Niveau de confiance'}));
+    for(const [v,t] of [['','Non renseigné'],['0','Je ne sais pas'],['1','Faible'],['2','Moyenne'],['3','Élevée']]){
+        add(conf,el('option',{value:v},t));
+    }
+    conf.value=a.confidence;conf.addEventListener('change',()=>{a.confidence=conf.value;saveLocal();});
+    const actions=add(root,el('div',{class:'buttons'}));
+    const prev=add(actions,button('← Précédent','',()=>go(i-1)));prev.disabled=i===0;
+    add(actions,button('Exporter un JSON provisoire','',exportJson));
+    if(i<qs.length-1) add(actions,button('Suivant →','primary push',()=>go(i+1)));
+    else add(actions,button('Bilan et export final →','primary push',()=>go('review')));
+}
+function addTextArea(root,q,a,prop,label,help,isCode){
+    const container=add(root,el('div',{class:'field'}));
+    const id='answer-'+prop;
+    const lab=add(container,el('label',{htmlFor:id},label+' '));
+    add(lab,el('span',{class:'help'},'— '+help));
+    const area=add(container,el('textarea',{id:id,class:isCode?'editor':'answer',
+                    spellcheck:isCode?'false':'true',placeholder:isCode?'// Ton code ici':'Écris ta réponse ici…'}));
+    area.value=a[prop];
+    area.addEventListener('input',()=>{a[prop]=area.value;markStarted();saveLocal();});
+    if(isCode) area.addEventListener('keydown',event=>{
+        if(event.key==='Tab'&&!event.shiftKey){
+            event.preventDefault();const st=area.selectionStart,end=area.selectionEnd;
+            area.value=area.value.slice(0,st)+'    '+area.value.slice(end);
+            area.selectionStart=area.selectionEnd=st+4;
+            a[prop]=area.value;markStarted();saveLocal();
+        }
+    });
+}
+function addMetaField(container,label,key,type='text'){
+    const wrap=add(container,el('div',{class:'field'}));
+    const id='meta-'+key;
+    add(wrap,el('label',{htmlFor:id},label));
+    const control=add(wrap,type==='textarea'?el('textarea',{id}):el('input',{id,type:'text'}));
+    control.value=state.metadata[key];
+    control.addEventListener('input',()=>{state.metadata[key]=control.value;saveLocal();});
+    return control;
+}
+function metaSelect(container,label,key,choices){
+    const wrap=add(container,el('div',{class:'field'}));
+    const id='meta-'+key;add(wrap,el('label',{htmlFor:id},label));
+    const control=add(wrap,el('select',{id}));
+    for(const [value,text] of choices)add(control,el('option',{value},text));
+    control.value=state.metadata[key];
+    control.addEventListener('change',()=>{state.metadata[key]=control.value;saveLocal();});
+}
+function renderProfile(){
+    const root=$('content');root.replaceChildren();
+    add(root,el('div',{class:'eyebrow'},'Préparation de la séance'));
+    add(root,el('h2',{class:'question-title'},'Consignes et informations de passation'));
+    paragraph(root,'Épreuve '+SPEC.title+' · 100 points · durée indicative : '+SPEC.duration+'.');
+    const box=add(root,el('div',{class:'panel'}));add(box,el('h3',{},'Consignes des sujets d’origine'));
+    const ul=add(box,el('ul'));
+    for(const x of SPEC.instructions)add(ul,el('li',{},x));
+    if(SPEC.hypothesis) paragraph(box,SPEC.hypothesis,'note');
+    add(root,el('div',{class:'notice'},'Pour un diagnostic crédible : ne lance pas les extraits de lecture de code avant d’avoir écrit ta prédiction. Pour les problèmes complets, tu peux compiler ensuite, en signalant les corrections apportées. Le temps est compté uniquement quand tu démarres le chronomètre et que l’onglet reste visible.'));
+    const grid=add(root,el('div',{class:'grid2'}));
+    addMetaField(grid,'Nom ou pseudonyme (facultatif)','name');
+    metaSelect(grid,'Compilation / exécution','compilation',[
+        ['non','Non, aucune exécution'],['apres','Oui, après première rédaction'],['pendant','Oui, pendant la rédaction']]);
+    addMetaField(root,'Aides et documentation utilisées (indiquer aussi toute aide IA)','assistance','textarea');
+    const actions=add(root,el('div',{class:'buttons'}));
+    add(actions,button('Importer un JSON existant','',()=>$('importFile').click()));
+    add(actions,button('Exporter une sauvegarde','',exportJson));
+    add(actions,button('Commencer par '+qs[0].id+' →','primary push',()=>go(0)));
+}
+function renderReview(){
+    const root=$('content');root.replaceChildren();
+    add(root,el('div',{class:'eyebrow'},'Bilan et export'));
+    add(root,el('h2',{class:'question-title'},'Vérifier et remettre le diagnostic'));
+    paragraph(root,'L’export est possible même si le diagnostic est incomplet : les questions sans réponse restent identifiées. Aucun score n’est calculé automatiquement.');
+    const complete=qs.filter(q=>state.answers[q.id].completed).length;
+    const filled=qs.filter(q=>answerHasText(state.answers[q.id])).length;
+    const summary=add(root,el('div',{class:'panel'}));
+    add(summary,el('h3',{},`${complete} / ${qs.length} terminés · ${filled} avec une réponse saisie`));
+    for(const q of qs){
+        const a=state.answers[q.id];
+        const item=add(summary,el('div',{class:'reviewitem'}));
+        add(item,el('strong',{},q.id));
+        const info=add(item,el('div'));
+        add(info,el('div',{},a.completed?'Marqué terminé':answerHasText(a)?'En cours':'Sans réponse'));
+        add(info,el('small',{},q.points+' points'+(a.review?' · À revoir':'')));
+        add(item,button('Ouvrir','small',()=>go(indices[q.id])));
+    }
+    add(root,el('h3',{},'Bilan personnel (sans note chiffrée)'));
+    metaSelect(root,'Degré de confiance général','assurance',[
+        ['','Non renseigné'],['faible','Faible'],['moyen','Moyen'],['bon','Bon'],['tres_bon','Très bon']]);
+    addMetaField(root,'Ce que je maîtrise','pointsForts','textarea');
+    addMetaField(root,'Questions difficiles / points fragiles','difficultes','textarea');
+    addMetaField(root,'Priorités de révision','priorites','textarea');
+    addMetaField(root,'Commentaires sur les conditions du test','remarque','textarea');
+    add(root,el('div',{class:'notice'},'Le JSON contient tes réponses, le code et les tests. Il ne contient ni corrigé ni note. Les points seront attribués après examen des réponses et, pour le code, de leur robustesse.'));
+    const actions=add(root,el('div',{class:'buttons'}));
+    add(actions,button('Revenir aux questions','',()=>go(qs.length-1)));
+    add(actions,button('Importer une sauvegarde','',()=>$('importFile').click()));
+    add(actions,button('Télécharger mes réponses (.json)','primary push',()=>{stopTimer();exportJson();}));
+    const extra=add(root,el('div',{class:'panel'}));
+    add(extra,el('h3',{},'Gestion de cette séance'));
+    paragraph(extra,'La remise à zéro supprime uniquement les données locales de cette épreuve sur ce navigateur. Exporte d’abord le JSON si tu veux garder une sauvegarde.','note');
+    add(extra,button('Réinitialiser cette épreuve','ghost',resetExam));
+}
+function go(position){
+    state.position=position;
+    saveLocal();
+    renderNavigation();
+    if(position==='profile') renderProfile();
+    else if(position==='review') renderReview();
+    else renderQuestion();
+    window.scrollTo({top:0,behavior:'instant'});
+}
+function exportJson(){
+    updateTimer();
+    const answers=qs.map(q=>({
+        id:q.id, section:q.section, points_max:q.points,
+        enonce:q.prompt, documents:q.blocks,
+        reponse:state.answers[q.id].text, code:state.answers[q.id].code,
+        tests:state.answers[q.id].tests, confiance:state.answers[q.id].confidence,
+        termine:state.answers[q.id].completed, a_revoir:state.answers[q.id].review
+    }));
+    const payload={
+        format:'capet-diagnostic-hors-ligne', version:1,
+        epreuve:{id:SPEC.id,titre:SPEC.title,points_max:100,questions:qs.length},
+        passation:{date_debut:state.startedAt, date_export:new Date().toISOString(),
+                   temps_actif_secondes:state.elapsedSeconds,...state.metadata},
+        progression:{termines:answers.filter(a=>a.termine).length,
+                     reponses_saisies:answers.filter(a=>(a.reponse+a.code+a.tests).trim()).length},
+        reponses:answers,
+        // Ce bloc facilite une éventuelle réimportation de ce même fichier.
+        reprise:{version:1,examId:SPEC.id,position:state.position,elapsedSeconds:state.elapsedSeconds,
+                running:false,startedAt:state.startedAt,metadata:state.metadata,answers:state.answers}
+    };
+    const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const link=el('a',{href:url,download:'CAPET_'+SPEC.id+'_reponses_'+new Date().toISOString().slice(0,10)+'.json'});
+    document.body.appendChild(link);link.click();link.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),2000);
+    saveLocal();
+}
+async function importJson(file){
+    if(!file)return;
+    try{
+        const data=JSON.parse(await file.text());
+        if(data.format!=='capet-diagnostic-hors-ligne' || data.epreuve?.id!==SPEC.id || !data.reprise)
+            throw new Error('Fichier JSON non reconnu ou correspondant à un autre langage.');
+        if(!confirm('Importer cette sauvegarde remplacera les réponses actuellement affichées. Continuer ?'))return;
+        if(state.running)stopTimer();
+        state=normalizeState(data.reprise);saveLocal();updateTimer();go(state.position);
+        alert('Réponses importées. Tu peux reprendre l’épreuve.');
+    }catch(error){alert('Import impossible : '+error.message);}
+    $('importFile').value='';
+}
+function resetExam(){
+    if(!confirm('Supprimer toutes les réponses locales de cette épreuve ? Cette action ne modifie pas les JSON déjà exportés.'))return;
+    state=emptyState();lastTick=null;
+    try{localStorage.removeItem(STORAGE_KEY);}catch(e){}
+    updateTimer();go('profile');
+}
+$('importFile').addEventListener('change',e=>importJson(e.target.files?.[0]));
+$('goProfile').addEventListener('click',()=>go('profile'));
+$('goReview').addEventListener('click',()=>go('review'));
+document.addEventListener('keydown',e=>{
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){
+        e.preventDefault();saveLocal();
+    }
+});
+$('pageTitle').textContent=SPEC.title;
+loadLocal();updateTimer();go(state.position);
+</script>
+</body></html>
